@@ -1,0 +1,38 @@
+version: '3.3'
+volumes:
+  deco-db:
+    driver: 'local'
+  deco-files:
+    driver: 'local'
+services:
+  db:
+    container_name: deco-db
+    image: bitnami/mariadb:5.5.48-0-r01
+    environment:
+      MYSQL_ROOT_PASSWORD: 'password'
+      MARIADB_DATABASE: deco_production
+      MARIADB_USER: deco
+      MARIADB_PASSWORD: password
+    env_file:
+      - .env.production
+    volumes:
+    - deco-db:/var/lib/mysql
+  web:
+    container_name: deco-web
+    build: ./web
+    ports:
+      - '8888:80'
+    env_file:
+      - .env.production
+    volumes:
+      - deco-files:/var/deco/files
+      - ./web/deco.conf:/etc/httpd/conf.d/deco.conf
+      - ./database.yml:/usr/local/deco/config/database.yml
+      - ./production.rb:/usr/local/deco/config/environments/production.rb
+  mail:
+    container_name: deco-mail
+    build: ./mail
+    ports:
+      - "8889:80"
+
+
